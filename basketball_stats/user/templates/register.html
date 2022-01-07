@@ -7,29 +7,37 @@
             <h1>회원가입</h1>
         </div>
     </div>
-    <div class="row">
-        <div class="col-12">
-            {{ error }}
-        </div>
-    </div>
     <div class="row mt-5">
         <form method="POST" action=".">
             {% csrf_token %}
             <div class="mb-3">
-                <label for="username" class="form-label">이름</label>
-                <input type="text" class="form-control" id="username" placeholder="이름" name="username">
-            </div>
-            <div class="mb-3">
-                <label for="teamname" class="form-label">팀명</label>
-                <input type="text" class="form-control" id="teamname" placeholder="팀명" name="teamname">
+                <label for="userid" class="form-label">아이디</label>
+                <input type="text" class="form-control" id="userid" placeholder="아이디를 입력해주세요." name="userid">
             </div>
             <div class="mb-3">
                 <label for="password" class="form-label">비밀번호</label>
-                <input type="password" class="form-control" id="password" placeholder="비밀번호" name="password">
+                <input type="password" class="form-control" id="password" placeholder="영어, 숫자, 특수문자 포함 8자 이상 입력해주세요." name="password">
             </div>
             <div class="mb-3">
                 <label for="re-password" class="form-label">비밀번호 확인</label>
-                <input type="password" class="form-control" id="re-password" placeholder="비밀번호 확인" name="re-password">
+                <input type="password" class="form-control" id="re-password" placeholder="비밀번호를 한번 더 입력해주세요." name="re-password">
+            </div>
+            <div class="mb-3">
+                <label for="username" class="form-label">이름</label>
+                <input type="text" class="form-control" id="username" placeholder="이름을 입력해주세요." name="username">
+            </div>
+            <div class="mb-3">
+                <label for="teamname" class="form-label">팀명</label>
+                <input type="text" class="form-control" id="teamname" placeholder="등록된 팀만 가입할 수 있습니다." name="teamname">
+            </div>
+            <div class="mb-3">
+                <label for="backnumber" class="form-label">등번호</label>
+                <input type="text" class="form-control" id="backnumber" placeholder="없으면 입력하지 않으셔도 됩니다." name="backnumber">
+            </div>
+            <div class="row">
+                <div class="col-12">
+                    {{ error }}
+                </div>
             </div>
             <button type="submit" class="btn btn-primary">가입</button>
         </form>
