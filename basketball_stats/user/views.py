@@ -5,9 +5,9 @@ from .forms import LoginForm, RegisterForm
 
 # Create your views here.
 def home(request):
-    id = request.session.get('user')
+    if request.session.get('user'):
+        id = request.session.get('user')
 
-    if id:
         bsuser = BsUser.objects.get(pk=id)
         return render(request, 'login.html')
 
