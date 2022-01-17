@@ -1,7 +1,7 @@
+from logging import PlaceHolder
 from django import forms
 from .models import BsUser
 from django.contrib.auth.hashers import check_password, make_password
-
 
 class LoginForm(forms.Form):
     userid = forms.CharField(
@@ -37,7 +37,9 @@ class RegisterForm(forms.Form):
         error_messages={
             'required': '아이디를 입력해주세요.'
         },
-        max_length=32, label="아이디")
+        max_length=32,
+        label="아이디",
+    )
     password = forms.CharField(
         error_messages={
             'required': '비밀번호를 입력해주세요.'
@@ -59,7 +61,7 @@ class RegisterForm(forms.Form):
         },
         max_length=32, label="팀명")
     backnumber = forms.CharField(
-        max_length=32, label="팀명")
+        max_length=32, label="등번호")
 
     def clean(self):
         cleaned_data = super().clean()
@@ -72,32 +74,24 @@ class RegisterForm(forms.Form):
 
         if userid and password and re_password and username and teamname:
             # 아이디 검사
-            if idCheck(userid):
+            if not idCheck(userid):
                 self.add_error('userid', '아이디 형식이 올바르지 않습니다.')
                 return
 
             # 비밀번호 검사
-            if passwordCheck(password):
+            if not passwordCheck(password):
                 self.add_error('password', '비밀번호 형식이 올바르지 않습니다.')
                 return
 
-            bsuser = BsUser(
-                user_id = userid,
-                password = make_password(password),
-                user_name = username,
-                team_name = teamname,
-                back_number = backnumber
-            )
-            bsuser.save()
-        
-        else:
-            self.add_error('등번호를 제외한 모든 항목을 입력해야합니다.')
-
-
+            if password != re_password:
+                self.add_error('re_password', '비밀번호가 일치하지 않습니다.')
+                return
 
 import re
 
 def idCheck(id):
+    # 영문으로 시작, 5~15자 길이
+    print('형식 검사할 아이디: ', id)
     ID_regex = re.compile("([A-za-z]{5,15})")
     ID_validation = ID_regex.search(id.replace(" ",""))
     
@@ -114,7 +108,7 @@ def passwordCheck(password):
         return False
 
     elif not re.findall('[`~!@#$%^&*(),<.>/?]+', password):
-        print('비밀번호는 최소 1개 이상의 특수문자가 포함되어야 함')  
+        print('비밀번호는 최소 1개 이상의 특수문자가 포함되어야 함')
         return False
 
     print('비밀번호의 길이, 숫자, 영문자 등 유효함!!')
