@@ -42,7 +42,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.humanize',
     'user',
+    'board',
+    'stats',
 ]
 
 MIDDLEWARE = [
@@ -61,7 +64,7 @@ TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [],
-        'APP_DIRS': True,
+        'APP_DIRS': True, # True : templates을 찾을 때 모든 app 안의 templates 폴더를 찾아본다
         'OPTIONS': {
             'context_processors': [
                 'django.template.context_processors.debug',

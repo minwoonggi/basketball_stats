@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% load humanize %}
+{% block contents %}
+<div class="row mt-5">
+    <div class="col-12">
+        <table class="table table-light">
+            <thead class="thead-light">
+                <tr>
+                    <th scope="col">번호</th>
+                    <th scope="col">글제목</th>
+                    <th scope="col">작성자</th>
+                    <th scope="col">등록날짜</th>
+                </tr>
+            </thead>
+            <tbody class="text-dark">
+                {% for board in boards %}
+                <tr>
+                    <th scope="row">{{ board.id }}</th>
+                    <th><a href=''>{{ board.title }}</a></th>
+                    <th>{{ board.content }}</th>
+                    <th>{{ board.registered_dttm|date:'Y-m-d H:i:s'  }}</th>
+                    <!-- django data filter -->
+                </tr>
+                {% endfor %}
+                {% for user in users %}
+                <tr>
+                    <th scope="row">{{ user.id }}</th>
+                    <th><a href=''>{{ user.user_id }}</a></th>
+                    <th>{{ user.user_name }}</th>
+                    <th>{{ user.registered_dttm|date:'Y-m-d H:i:s'  }}</th>
+                    <!-- django data filter -->
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

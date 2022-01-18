@@ -5,7 +5,7 @@ from .models import BsUser
 
 
 class BsUserAdmin(admin.ModelAdmin):
-    list_display = ('user_id', 'password', 'user_name',
+    list_display = ('id', 'user_id', 'password', 'user_name',
                     'team_name', 'back_number')
 
 

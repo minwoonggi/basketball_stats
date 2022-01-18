@@ -16,9 +16,15 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from user.views import home
+from board.views import BsBoard
 
 urlpatterns = [
+    # admin
     path('admin/', admin.site.urls),
+    # home
     path('', home),
+    # user
     path('user/', include('user.urls')),
+    # board
+    path('board/', BsBoard.as_view()),
 ]
