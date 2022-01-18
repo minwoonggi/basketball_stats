@@ -1,9 +1,14 @@
-from logging import PlaceHolder
 from django import forms
 from .models import BsUser
 from django.contrib.auth.hashers import check_password, make_password
+from .utils import idCheck, passwordCheck
+
 
 class LoginForm(forms.Form):
+    class Meta:
+        model = BsUser
+        fields = ('userid', 'password')
+
     userid = forms.CharField(
         error_messages={
             'required': '아이디를 입력해주세요.'
@@ -14,6 +19,7 @@ class LoginForm(forms.Form):
             'required': '비밀번호를 입력해주세요.'
         },
         widget=forms.PasswordInput, label="비밀번호")
+
     def clean(self):
         cleaned_data = super().clean()
         userid = cleaned_data.get('userid')
@@ -32,36 +38,58 @@ class LoginForm(forms.Form):
                 self.id = bsuser.id
 
 
-class RegisterForm(forms.Form):
+class RegisterForm(forms.ModelForm):
+
+    class Meta:
+        model = BsUser
+        fields = ('userid', 'password', 're_password', 'username', 'teamname', 'backnumber')
+
     userid = forms.CharField(
         error_messages={
             'required': '아이디를 입력해주세요.'
         },
         max_length=32,
         label="아이디",
+        required=True,
+        help_text='영문으로 시작, 5~15자 길이'
     )
     password = forms.CharField(
         error_messages={
             'required': '비밀번호를 입력해주세요.'
         },
-        widget=forms.PasswordInput, label="비밀번호")
+        widget=forms.PasswordInput,
+        label='비밀번호',
+        help_text='8자 이상, 특수문자 포함'
+    )
     re_password = forms.CharField(
         error_messages={
             'required': '비밀번호를 입력해주세요.'
         },
-        widget=forms.PasswordInput, label="비밀번호 확인")
+        help_text='비밀번호를 한번 더 입력해주세요.',
+        widget=forms.PasswordInput,
+        label="비밀번호 확인"
+    )
     username = forms.CharField(
         error_messages={
             'required': '이름을 입력해주세요.'
         },
-        max_length=32, label="이름")
+        max_length=32,
+        label="이름",
+        help_text='이름'
+    )
     teamname = forms.CharField(
         error_messages={
             'required': '팀명을 입력해주세요.'
         },
-        max_length=32, label="팀명")
+        max_length=32,
+        label='팀명',
+        help_text='팀명'
+    )
     backnumber = forms.CharField(
-        max_length=32, label="등번호")
+        max_length=32,
+        label='등번호',
+        help_text='등번호'
+    )
 
     def clean(self):
         cleaned_data = super().clean()
@@ -86,30 +114,3 @@ class RegisterForm(forms.Form):
             if password != re_password:
                 self.add_error('re_password', '비밀번호가 일치하지 않습니다.')
                 return
-
-import re
-
-def idCheck(id):
-    # 영문으로 시작, 5~15자 길이
-    print('형식 검사할 아이디: ', id)
-    ID_regex = re.compile("([A-za-z]{5,15})")
-    ID_validation = ID_regex.search(id.replace(" ",""))
-    
-    if ID_validation:
-        return True
-    else:
-        return False
-
-def passwordCheck(password):
-    
-    if len(password) < 8 or len(password) > 21 and not re.findall('[0-9]+', password) and not \
-    re.findall('[a-z]', password) or not re.findall('[A-Z]', password):
-        print('비밀번호 기준(숫자, 영문 대소문자 구성)에 맞지 않습니다.')
-        return False
-
-    elif not re.findall('[`~!@#$%^&*(),<.>/?]+', password):
-        print('비밀번호는 최소 1개 이상의 특수문자가 포함되어야 함')
-        return False
-
-    print('비밀번호의 길이, 숫자, 영문자 등 유효함!!')
-    return True

@@ -6,6 +6,8 @@ from .models import BsUser
 from .forms import LoginForm, RegisterForm
 
 # Create your views here.
+
+
 class UserCreate(FormView):
     template_name = 'register.html'
     form_class = RegisterForm
@@ -29,6 +31,37 @@ class UserCreate(FormView):
 
         return super().form_valid(form)
 
+class UserLogin(FormView):
+    template_name = 'login.html'
+    form_class = LoginForm
+    success_url = '/'
+
+    def form_valid(self,form):
+        userid = form.cleaned_data.get('userid')
+        password = form.cleaned_data.get('password')
+
+        if userid and password:
+            try:
+                bsuser = BsUser.objects.get(userid=userid)
+                if not check_password(password, bsuser.password):
+                    return
+                else:
+                    self.request.session['userid'] = userid
+                    return super().form_valid(form)
+            except:
+                return
+
+# def login(request):
+#     if request.method == 'POST':
+#         form = LoginForm(request.POST)
+#         if form.is_valid():
+#             request.session['user'] = form.id
+#             return redirect('/')
+#     else:
+#         form = LoginForm()
+
+#     return render(request, 'login.html', {'form': form})
+
 def home(request):
     if request.session.get('user'):
         id = request.session.get('user')
@@ -37,17 +70,6 @@ def home(request):
         return render(request, 'login.html')
 
     return render(request, 'login.html')
-
-def login(request):
-    if request.method == 'POST':
-        form = LoginForm(request.POST)
-        if form.is_valid():
-            request.session['user'] = form.id
-            return redirect('/')
-    else:
-        form = LoginForm()
-
-    return render(request, 'login.html', { 'form' : form })
 
 
 # def register(request):
@@ -64,7 +86,6 @@ def login(request):
 #         #     teamname = form.teamname
 #         #     backnumber = form.backnumber
 
-        
 
 #         # # 필수 입력 항목을 입력하지 않았을 경우
 #         # if not (userid and password and repassword and username and teamname):
@@ -79,8 +100,8 @@ def login(request):
 #         #     res_data['error'] = '비밀번호가 일치하지 않습니다.'
 
 #         # # 등록된 팀이 아닌 경우 (team table 생성 후)
-        
-        
+
+
 #         # 회원가입 저장
 #         # else:
 #         #     bsuser = BsUser(
@@ -91,7 +112,7 @@ def login(request):
 #         #         back_number = backnumber
 #         #     )
 #         #     bsuser.save()
-            
+
 #         #     # 회원가입 후 home으로 이동
 #             return redirect('/')
 
