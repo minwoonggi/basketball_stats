@@ -1,5 +1,5 @@
 from django import forms
-from .models import BsUser
+from .models import BsTeam, BsUser
 from django.contrib.auth.hashers import check_password, make_password
 from .utils import idCheck, passwordCheck
 
@@ -75,7 +75,7 @@ class RegisterForm(forms.ModelForm):
         },
         max_length=32,
         label="이름",
-        help_text='이름'
+        help_text='이름을 입력해주세요.'
     )
     teamname = forms.CharField(
         error_messages={
@@ -83,12 +83,13 @@ class RegisterForm(forms.ModelForm):
         },
         max_length=32,
         label='팀명',
-        help_text='팀명'
+        help_text='팀명을 입력해주세요.'
     )
     backnumber = forms.CharField(
         max_length=32,
         label='등번호',
-        help_text='등번호'
+        help_text='없을 경우 입력하지 않으셔도 됩니다.',
+        required=False
     )
 
     def clean(self):
@@ -114,3 +115,47 @@ class RegisterForm(forms.ModelForm):
             if password != re_password:
                 self.add_error('re_password', '비밀번호가 일치하지 않습니다.')
                 return
+
+class RegisterTeamForm(forms.ModelForm):
+
+    class Meta:
+        model = BsTeam
+        fields = ('teamname', 'name', 'phone')
+
+    teamname = forms.CharField(
+        error_messages={
+            'required': '팀명을 입력해주세요.'
+        },
+        max_length=32,
+        label="팀명",
+        required=True,
+        help_text='팀명을 입력해주세요.'
+    )
+    name = forms.CharField(
+        error_messages={
+            'required': '이름을 입력해주세요.'
+        },
+        max_length=32,
+        label="이름",
+        required=True,
+        help_text='이름을 입력해주세요.'
+    )
+    phone = forms.CharField(
+        error_messages={
+            'required': '전화번호를 입력해주세요.'
+        },
+        max_length=32,
+        label="전화번호",
+        required=True,
+        help_text='\'-\'을 제외하고 입력해주세요.'
+    )
+
+    def clean(self):
+        cleaned_data = super().clean()
+        teamname = cleaned_data.get('teamname')
+        phone = cleaned_data.get('phone')
+
+        if teamname and phone:
+            pass
+        else:
+            self.add_error('teamname', '비밀번호가 일치하지 않습니다.')

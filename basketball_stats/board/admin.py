@@ -5,7 +5,7 @@ from .models import BsBoard
 
 
 class BsBoardAdmin(admin.ModelAdmin):
-    list_display = ('id', 'bsuser_id', 'title', 'content', 'image',
+    list_display = ('id', 'user_id', 'title', 'content', 'image',
                     'registered_dttm', 'updated_dttm')
 
 

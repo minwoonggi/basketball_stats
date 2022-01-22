@@ -2,8 +2,10 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.hashers import make_password, check_password
 from django.views.generic.edit import FormView
 from django.views.generic import ListView
-from .models import BsUser
-from .forms import LoginForm, RegisterForm
+from .models import BsUser, BsTeam
+from .forms import LoginForm, RegisterForm, RegisterTeamForm
+from .telegram import sendMsg
+import datetime
 
 # Create your views here.
 
@@ -11,14 +13,14 @@ from .forms import LoginForm, RegisterForm
 class UserCreate(FormView):
     template_name = 'register.html'
     form_class = RegisterForm
-    success_url = '/user/login'
+    success_url = '/login'
 
     def form_valid(self, form):
-        userid = form.cleaned_data.get('userid')
-        password = form.cleaned_data.get('password')
-        username = form.cleaned_data.get('username')
-        teamname = form.cleaned_data.get('teamname')
-        backnumber = form.cleaned_data.get('backnumber')
+        userid = form.data.get('userid')
+        password = form.data.get('password')
+        username = form.data.get('username')
+        teamname = form.data.get('teamname')
+        backnumber = form.data.get('backnumber')
 
         bsuser = BsUser(
             user_id=userid,
@@ -37,8 +39,8 @@ class UserLogin(FormView):
     success_url = '/'
 
     def form_valid(self,form):
-        userid = form.cleaned_data.get('userid')
-        password = form.cleaned_data.get('password')
+        userid = form.data.get('userid')
+        password = form.data.get('password')
 
         if userid and password:
             try:
@@ -46,7 +48,7 @@ class UserLogin(FormView):
                 if not check_password(password, bsuser.password):
                     return
                 else:
-                    self.request.session['userid'] = userid
+                    self.request.session['user'] = userid
                     return super().form_valid(form)
             except:
                 return
@@ -62,15 +64,43 @@ class UserLogin(FormView):
 
 #     return render(request, 'login.html', {'form': form})
 
+class TeamCreate(FormView):
+    template_name = 'register_team.html'
+    form_class = RegisterTeamForm
+    success_url = '/'
+
+    def form_valid(self, form):
+        teamname = form.data.get('teamname')
+        name = form.data.get('name')
+        phone = form.data.get('phone')
+
+        sendMsg('\'{0}\' 팀 등록이 요청되었습니다. \n이름: {1} \n전화번호: {2} \n승인하시겠습니까? \
+            \n [Yes](http://127.0.0.1:8000/team_approve/?teamname={0}&yn=Y) \
+            \t [No](http://127.0.0.1:8000/team_approve/?teamname={0}&yn=N)'.format(teamname, name, phone))
+
+        return super().form_valid(form)
+
+def teamApproval(request):
+    teamname = request.GET.get('teamname')
+    yn = request.GET.get('yn')
+    
+    if yn == 'Y':
+        bsteam = BsTeam(
+            team_name=teamname,
+            team_yn=yn,
+            yn_dttm=datetime.datetime.now(),
+            registered_dttm=datetime.datetime.now(),
+            updated_dttm=datetime.datetime.now(),
+        )
+        bsteam.save()
+        sendMsg('\'%s\' 팀 등록이 완료되었습니다.' % teamname)
+        return render(request, 'register_team_yn.html', {'approve': 'Y', 'teamname': teamname })
+    else:
+        sendMsg('\'%s\' 팀 등록이 반려되었습니다.' % teamname)
+        return render(request, 'register_team_yn.html', {'approve': 'N', 'teamname': teamname })
+
 def home(request):
-    if request.session.get('user'):
-        id = request.session.get('user')
-
-        bsuser = BsUser.objects.get(pk=id)
-        return render(request, 'login.html')
-
-    return render(request, 'login.html')
-
+    return render(request, 'home.html')
 
 # def register(request):
 #     res_data = {}
