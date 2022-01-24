@@ -9,7 +9,6 @@ import datetime
 
 # Create your views here.
 
-
 class UserCreate(FormView):
     template_name = 'register.html'
     form_class = RegisterForm
@@ -42,6 +41,7 @@ class UserLogin(FormView):
         userid = form.data.get('userid')
         password = form.data.get('password')
 
+        # 팀 확인
         if userid and password:
             try:
                 bsuser = BsUser.objects.get(userid=userid)
@@ -53,6 +53,8 @@ class UserLogin(FormView):
             except:
                 return
 
+
+
 # def login(request):
 #     if request.method == 'POST':
 #         form = LoginForm(request.POST)
@@ -61,7 +63,6 @@ class UserLogin(FormView):
 #             return redirect('/')
 #     else:
 #         form = LoginForm()
-
 #     return render(request, 'login.html', {'form': form})
 
 class TeamCreate(FormView):
