@@ -4,5 +4,14 @@
         <button type="button" onclick="location.href='/login'">로그인</button>
         <button type="button" onclick="location.href='/register_team'">팀 등록</button>
         <button type="button" onclick="location.href='/boards'">게시판</button>
+        <div>
+            {% if messages %}
+            <ul class="messages">
+                {% for message in messages %}
+                <li style="color:red" {% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+                {% endfor %}
+            </ul>
+            {% endif %}
+        </div>
     </body>
 </html>

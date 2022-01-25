@@ -2,6 +2,9 @@
 
 {% block contents %}
 <div class="container">
+    <div>
+        <button type="button" onclick="location.href='/'">home</button>
+    </div>
     <div class="row mt-5">
         <div class="col-12 text-center">
             <h1>로그인</h1>
@@ -26,6 +29,15 @@
             <span style="color:red">{{ field.errors }}</span>
             {% endif %}
             {% endfor %}
+            <div>
+                {% if messages %}
+                <ul class="messages">
+                    {% for message in messages %}
+                    <li style="color:red" {% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+                    {% endfor %}
+                </ul>
+                {% endif %}
+            </div>
             <button type="submit" class="btn btn-primary">로그인</button>
         </form>
     </div>

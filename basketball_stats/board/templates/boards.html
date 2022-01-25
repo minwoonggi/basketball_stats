@@ -3,6 +3,9 @@
 {% block contents %}
 <div class="row mt-5">
     <div class="col-12">
+        <div>
+            <button type="button" onclick="location.href='/'">home</button>
+        </div>
         <table class="table table-light">
             <thead class="thead-light">
                 <tr>
@@ -16,7 +19,7 @@
                 {% for board in boards %}
                 <tr>
                     <th scope="row">{{ board.id }}</th>
-                    <th><a href=''>{{ board.title }}</a></th>
+                    <th><a style="color: black;" href=''>{{ board.title }}</a></th>
                     <th>{{ board.content }}</th>
                     <th>{{ board.registered_dttm|date:'Y-m-d H:i:s'  }}</th>
                     <!-- django data filter -->
@@ -33,6 +36,9 @@
                 {% endfor %}
             </tbody>
         </table>
+    </div>
+    <div>
+        <button type="button" onclick="location.href='/board'">글쓰기</button>
     </div>
 </div>
 {% endblock %}

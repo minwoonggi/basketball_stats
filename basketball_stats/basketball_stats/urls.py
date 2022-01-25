@@ -29,8 +29,8 @@ urlpatterns = [
     path('register_team/', TeamCreate.as_view()),
     path('team_approve/', teamApproval),
     # board 
-    path('boards/', Board),
-    # path('boards/', Board.as_view()) # class
+    # path('boards/', Board),
+    path('boards/', Board.as_view()), # class
     path('board/', BoardCreate.as_view()),
     # path('board/<int:pk>')
 

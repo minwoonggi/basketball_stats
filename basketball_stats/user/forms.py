@@ -25,21 +25,7 @@ class LoginForm(forms.Form):
         userid = cleaned_data.get('userid')
         password = cleaned_data.get('password')
 
-        if userid and password:
-            try:
-                bsuser = BsUser.objects.get(user_id=userid)
-            except BsUser.DoesNotExist:
-                self.add_error('userid', '아이디가 없습니다.')
-                return
-
-            if not check_password(password, bsuser.password):
-                self.add_error('password', '비밀번호를 틀렸습니다.')
-            else:
-                self.id = bsuser.id
-
-
 class RegisterForm(forms.ModelForm):
-
     class Meta:
         model = BsUser
         fields = ('userid', 'password', 're_password', 'username', 'teamname', 'backnumber')

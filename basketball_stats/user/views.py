@@ -1,5 +1,7 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.hashers import make_password, check_password
+from django.contrib import messages
+from django.contrib.messages.views import SuccessMessageMixin
 from django.views.generic.edit import FormView
 from django.views.generic import ListView
 from .models import BsUser, BsTeam
@@ -9,7 +11,9 @@ import datetime
 
 # Create your views here.
 
-class UserCreate(FormView):
+
+# 회원가입
+class UserCreate(SuccessMessageMixin, FormView):
     template_name = 'register.html'
     form_class = RegisterForm
     success_url = '/login'
@@ -21,18 +25,24 @@ class UserCreate(FormView):
         teamname = form.data.get('teamname')
         backnumber = form.data.get('backnumber')
 
-        bsuser = BsUser(
-            user_id=userid,
-            password=make_password(password),
-            user_name=username,
-            team_name=teamname,
-            back_number=backnumber
-        )
-        bsuser.save()
+        bsteam = BsTeam.objects.filter(team_name=teamname)
 
-        return super().form_valid(form)
+        if bsteam.exists():
+            bsuser = BsUser(
+                user_id=userid,
+                password=make_password(password),
+                user_name=username,
+                team_name=bsteam[0],
+                back_number=backnumber
+            )
+            bsuser.save()
+            return super().form_valid(form)
+        else:
+            messages.info(self.request, '등록되지 않은 팀입니다. 팀 등록 먼저 한 후 가입해주세요.')
+            return super().form_valid(form)
 
-class UserLogin(FormView):
+# 로그인
+class UserLogin(SuccessMessageMixin, FormView):
     template_name = 'login.html'
     form_class = LoginForm
     success_url = '/'
@@ -40,31 +50,31 @@ class UserLogin(FormView):
     def form_valid(self,form):
         userid = form.data.get('userid')
         password = form.data.get('password')
+        print('=================')
+        print(userid, password)
+        print('=================')
 
-        # 팀 확인
         if userid and password:
             try:
-                bsuser = BsUser.objects.get(userid=userid)
-                if not check_password(password, bsuser.password):
-                    return
+                bsuser = BsUser.objects.filter(user_id=userid)
+                if bsuser.exists():
+                    # print('=================')
+                    # print('bsuser', bsuser)
+                    # print('=================')
+                    if check_password(password, bsuser[0].password):
+                        self.request.session['user'] = userid
+                    else:
+                        self.success_url = '/login'
+                        messages.info(self.request, '올바르지 않은 비밀번호입니다.')
                 else:
-                    self.request.session['user'] = userid
-                    return super().form_valid(form)
+                    self.success_url = '/login'
+                    messages.info(self.request, '올바르지 않은 아이디입니다.')
+                return super().form_valid(form)
             except:
-                return
+                messages.error(self.request, 'error!')
+                return super().form_valid(form)
 
-
-
-# def login(request):
-#     if request.method == 'POST':
-#         form = LoginForm(request.POST)
-#         if form.is_valid():
-#             request.session['user'] = form.id
-#             return redirect('/')
-#     else:
-#         form = LoginForm()
-#     return render(request, 'login.html', {'form': form})
-
+# 팀 등록 신청
 class TeamCreate(FormView):
     template_name = 'register_team.html'
     form_class = RegisterTeamForm
@@ -81,6 +91,7 @@ class TeamCreate(FormView):
 
         return super().form_valid(form)
 
+# 팀 등록 신청 승인, 반려
 def teamApproval(request):
     teamname = request.GET.get('teamname')
     yn = request.GET.get('yn')
@@ -103,6 +114,7 @@ def teamApproval(request):
 def home(request):
     return render(request, 'home.html')
 
+# 회원가입 함수형
 # def register(request):
 #     res_data = {}
 #     if request.method == 'GET':
@@ -117,7 +129,6 @@ def home(request):
 #         #     teamname = form.teamname
 #         #     backnumber = form.backnumber
 
-
 #         # # 필수 입력 항목을 입력하지 않았을 경우
 #         # if not (userid and password and repassword and username and teamname):
 #         #     res_data['error'] = '등번호를 제외한 모든 항목을 입력해야합니다.'
@@ -131,7 +142,6 @@ def home(request):
 #         #     res_data['error'] = '비밀번호가 일치하지 않습니다.'
 
 #         # # 등록된 팀이 아닌 경우 (team table 생성 후)
-
 
 #         # 회원가입 저장
 #         # else:
@@ -148,3 +158,14 @@ def home(request):
 #             return redirect('/')
 
 #         return render(request, 'register.html', res_data)
+
+# 로그인 함수형
+# def login(request):
+#     if request.method == 'POST':
+#         form = LoginForm(request.POST)
+#         if form.is_valid():
+#             request.session['user'] = form.id
+#             return redirect('/')
+#     else:
+#         form = LoginForm()
+#     return render(request, 'login.html', {'form': form})
